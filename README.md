@@ -1,22 +1,22 @@
 # Subpolynomial $n^{4/3} \exp(O((\log n / \log \log n)^{2/3}))$ Upper Bound for Erdős Problem #711 in Lean 4
 
-> **Scope note:** **Erdős Problem #711 (Part A: $\max_m f(n, m) \le n^{1+o(1)}$) remains open.** This repository formalizes an incremental improvement to the subpolynomial error factor in the $n^{4/3}$ upper bound of Chen and Korsky (`arXiv:2607.26450`, Aug 2026), reducing $\exp(O(\log n / \log \log n))$ to $\exp(O((\log n / \log \log n)^{2/3}))$, together with a self-contained Lean 4 proof of $h_P(n) \le C n^{4/3}$ for Erdős Problem #860 (primes).
+> **Scope note:** **Erdős Problem #711 (Part A: $\max_m f(n, m) \le n^{1+o(1)}$) remains open.** This repository formalizes an incremental improvement to the subpolynomial error factor in the $n^{4/3}$ upper bound of Chen and Korsky (`arXiv:2607.26450`, July 2026), reducing $\exp(O(\log n / \log \log n))$ to $\exp(O((\log n / \log \log n)^{2/3}))$, together with a self-contained Lean 4 proof of $h_P(n) \le C n^{4/3}$ for Erdős Problem #860 (primes; note that Chen and Korsky's paper proves the stronger $h_P(n) \ll n^{4/3} / (\log n)^{1/3}$).
 
 ## Overview
 
 For integers $n \ge 1$ and $m \ge 0$, let $f(n, m)$ denote the least $L$ such that $(m, m + L)$ contains pairwise distinct multiples $a_k$ ($k \mid a_k$) for all $1 \le k \le n$, and let $f_{\mathrm{closed}}(n, m)$ denote the corresponding least $h$ for $(m, m + h]$. Let $h_P(n)$ denote the analogous supremum over $m$ restricted to primes $p \le n$.
 
-Chen and Korsky (`arXiv:2607.26450`, Aug 2026) proved $F(n) := \sup_m f(n, m) \le n^{4/3} \exp(O(\log n / \log \log n))$ and $h_P(n) \le C n^{4/3}$. The formalization in [`RHDirect/PPL173_WorldRecordFourThirds.lean`](RHDirect/PPL173_WorldRecordFourThirds.lean) establishes the improved subpolynomial factor:
+Chen and Korsky (`arXiv:2607.26450`, July 2026) proved $F(n) := \sup_m f(n, m) \le n^{4/3} \exp(O(\log n / \log \log n))$ and $h_P(n) \ll n^{4/3} / (\log n)^{1/3}$. The formalization in [`RHDirect/PPL173_WorldRecordFourThirds.lean`](RHDirect/PPL173_WorldRecordFourThirds.lean) establishes the improved subpolynomial factor:
 
 $$
 \sup_{m \in \mathbb{N}} f(n, m) \le n^{4/3} \exp\!\left(C \left(\frac{\log n}{\log \log n}\right)^{2/3}\right) \qquad (n \ge 16)
 $$
 
-for an explicit absolute constant $C > 0$, along with the $n^{4/3 + \varepsilon}$ corollary for all $\varepsilon > 0$ and $n \ge 1$, and $h_P(n) \le C n^{4/3}$ for all $n \ge 1$.
+for an explicit absolute constant $C > 0$, along with the $n^{4/3 + \varepsilon}$ corollary for all $\varepsilon > 0$ and $n \ge 1$, and a self-contained Lean 4 proof of $h_P(n) \le C n^{4/3}$ for all $n \ge 1$.
 
 ## Exported Theorem Statements
 
-All top-level theorems in `namespace PPL173FourThirds` ([`RHDirect/PPL173_WorldRecordFourThirds.lean`](RHDirect/PPL173_WorldRecordFourThirds.lean)) are stated directly in terms of Mathlib `⨆` and `sInf` on `Set ℕ`, with zero custom masking definitions. Both nonemptiness of each `sInf` set and `BddAbove` for every `⨆ m` range are proved unconditionally (via `exists_distinct_multiples_trivial_sq` and `hbdd`), so no supremum or infimum is vacuous.
+All top-level theorems in `namespace PPL173FourThirds` ([`RHDirect/PPL173_WorldRecordFourThirds.lean`](RHDirect/PPL173_WorldRecordFourThirds.lean)) are stated directly in terms of Mathlib `⨆` and `sInf` on `Set ℕ`, with zero custom masking definitions. Both nonemptiness of each `sInf` set and `BddAbove` for every `⨆ m` range are proved unconditionally (internally via trivial $n^2$ / $n^2 + 1$ witnesses inside each proof), so no supremum or infimum is vacuous.
 
 ```lean
 theorem ppl173_world_record_four_thirds_iSup :
@@ -63,7 +63,7 @@ The formalization is self-contained over Mathlib (`0df444a360eaa60ab8c11dca51a86
 - **Toolchain:** `leanprover/lean4:v4.33.1`
 - **Mathlib4 revision:** `0df444a360eaa60ab8c11dca51a86af692955474`
 - **Source file:** `RHDirect/PPL173_WorldRecordFourThirds.lean` (5,982 lines; 361,302 bytes; SHA-256: `8AC847762F461B4C257216FCE6F0615D6168CB1BDCCC11F408CB6FA26AF45C04`)
-- **Build & kernel check:** `lake build` (`0` warnings) and `leanchecker RHDirect.PPL173_WorldRecordFourThirds` (`PASS`)
+- **Build & kernel check:** `lake build` (`0` warnings) and `lake env leanchecker RHDirect.PPL173_WorldRecordFourThirds` (`PASS`)
 - **Axiom audit (`Lean.collectAxioms`):** `469` constants audited in `RHDirect.PPL173_WorldRecordFourThirds`; axioms used: `[Quot.sound, Classical.choice, propext]`
 - **Static check:** No `sorry`, `sorryAx`, `admit`, `axiom`, `opaque`, `native_decide`, `unsafe`, `@[implemented_by]`, `@[extern]`, or `import Mathlib`.
 
@@ -88,9 +88,9 @@ Verbatim `#print axioms` output:
 ```bash
 lake exe cache get   # optional: fetch prebuilt Mathlib oleans
 lake build
-leanchecker RHDirect.PPL173_WorldRecordFourThirds
+lake env leanchecker RHDirect.PPL173_WorldRecordFourThirds
 ```
 
 ## License
 
-[MIT](LICENSE)
+[Apache-2.0](LICENSE)
